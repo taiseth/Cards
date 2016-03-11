@@ -17,7 +17,7 @@ public class Card
 	/*
 	 * Returns the value of the card 
 	 */
-	public int returnValue()
+	public int getValue()
 	{
 		return value;
 	}
@@ -25,7 +25,7 @@ public class Card
 	/*
 	 * Returns the suit of the card  
 	 */
-	public String returnSuit()
+	public String getSuit()
 	{
 		String first = suit.charAt(0) + "";
 		first = first.toUpperCase();
@@ -37,7 +37,7 @@ public class Card
 	 * Returns color of the card based on the suit
 	 * If invalid suit, returns "invalid suit" 
 	 */
-	public String returnColor()
+	public String getColor()
 	{
 		if(suit.equals("hearts") || suit.equals("diamonds"))
 		{
@@ -57,7 +57,7 @@ public class Card
 	 * Returns the rank of the card
 	 * such as Ace, Jack, Queen, King, etc. 
 	 */
-	public String returnRank()
+	public String getRank()
 	{
 		String rank;
 		switch(value)
@@ -97,7 +97,7 @@ public class Card
 	public static void main(String[] args)
 	{
 		Card ex = new Card(1, "SPADES");
-		System.out.println("This card is the " + ex.returnRank() + " of " + ex.returnSuit());
-		System.out.println("Color is " + ex.returnColor());
+		System.out.println("This card is the " + ex.getRank() + " of " + ex.getSuit());
+		System.out.println("Color is " + ex.getColor());
 	}
 }

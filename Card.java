@@ -47,6 +47,10 @@ public class Card
 		{
 			return "black";
 		}
+		else if(suit.equals("joker"))
+		{
+			return "joker";
+		}
 		else
 		{
 			return "invalid suit";
@@ -62,6 +66,8 @@ public class Card
 		String rank;
 		switch(value)
 		{
+			case 0: rank = "Joker";
+					break;
 			case 1: rank = "Ace";
 					break;
 			case 2: rank = "Two";
@@ -96,7 +102,7 @@ public class Card
 	
 	public static void main(String[] args)
 	{
-		Card ex = new Card(1, "SPADES");
+		Card ex = new Card(0, "JOKER");
 		System.out.println("This card is the " + ex.getRank() + " of " + ex.getSuit());
 		System.out.println("Color is " + ex.getColor());
 	}

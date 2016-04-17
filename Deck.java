@@ -4,22 +4,54 @@ public class Deck
 {
 	protected int size = 52;
 	private ArrayList<Card> deck = new ArrayList<Card>();
+	private String suits[] = {"clubs", "diamonds", "hearts", "spades"};
 	
-	public Deck(int size)
+	/*
+	 * Default constructor for a Deck
+	 */
+	public Deck()
 	{
-		this.size = size;
-		create(size, 0);
+		create(0);
 	}
 	
-	public Deck(int size, int joker)
+	/*
+	 * Constructor for a deck with joker(s) 
+	 */
+	public Deck(int joker)
 	{
 		this.size = size + joker;
-		create(size, joker);
+		create(joker);
 	}
 	
-	private void create(int amt, int jkr)
+	/*
+	 * Creates a deck of 52 cards w/ jokers if indicated 
+	 */
+	private void create(int jkr)
 	{
+		// fills the deck with default 52 cards
+		for(int i = 0; i < 4; i++) // goes through each suit
+		{
+			for(int j = 0; j < 13; j++) // goes from 1 to 13
+			{
+				Card crd = new Card(j + 1, suits[i]);
+				deck.add(crd);
+			}
+		}
 		
+		// adds the amount of jokers told
+		if(jkr != 0)
+		{
+			for(int k = 0; k < jkr; k++)
+			{
+				Card c = new Card(0, "joker");
+				deck.add(c);
+			}
+		}
+	}
+	
+	public Card draw()
+	{
+		return deck.get(0);
 	}
 	
 }

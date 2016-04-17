@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Deck
 {
@@ -49,9 +50,27 @@ public class Deck
 		}
 	}
 	
+	/*
+	 * Draw a card from the top of the deck
+	 * Card is removed from deck, deck is decremented
+	 */
 	public Card draw()
 	{
 		return deck.get(0);
 	}
 	
+	/* 
+	 * Randomizes the elements in the deck list
+	 */
+	public void shuffle()
+	{
+		Collections.shuffle(deck);
+	}
+	
+	
+	
+//	public static void main(String[] args)
+//	{
+//		
+//	}
 }

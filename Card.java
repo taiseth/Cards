@@ -100,10 +100,10 @@ public class Card
 		return rank;
 	}
 	
-	public static void main(String[] args)
-	{
-		Card ex = new Card(0, "JOKER");
-		System.out.println("This card is the " + ex.getRank() + " of " + ex.getSuit());
-		System.out.println("Color is " + ex.getColor());
-	}
+//	public static void main(String[] args)
+//	{
+//		Card ex = new Card(0, "JOKER");
+//		System.out.println("This card is the " + ex.getRank() + " of " + ex.getSuit());
+//		System.out.println("Color is " + ex.getColor());
+//	}
 }

@@ -27,7 +27,7 @@ public class Deck
 	/*
 	 * Creates a deck of 52 cards w/ jokers if indicated 
 	 */
-	private void create(int jkr)
+	private void create(int joker)
 	{
 		// fills the deck with default 52 cards
 		for(int i = 0; i < 4; i++) // goes through each suit
@@ -39,10 +39,10 @@ public class Deck
 			}
 		}
 		
-		// adds the amount of jokers told
-		if(jkr != 0)
+		// adds the amount of jokers
+		if(joker != 0)
 		{
-			for(int k = 0; k < jkr; k++)
+			for(int k = 0; k < joker; k++)
 			{
 				Card c = new Card(0, "joker");
 				deck.add(c);
@@ -56,7 +56,10 @@ public class Deck
 	 */
 	public Card draw()
 	{
-		return deck.get(0);
+		Card top = deck.get(0);
+		deck.remove(0);
+		this.size--;
+		return top;
 	}
 	
 	/* 
@@ -67,10 +70,43 @@ public class Deck
 		Collections.shuffle(deck);
 	}
 	
+	/*
+	 * Returns the size of the deck
+	 */
+	public int getSize()
+	{
+		return this.size;
+	}
 	
+	/*
+	 * Adds a card to the top of the deck
+	 */
+	public void addTop(Card c)
+	{
+		deck.add(0, c);
+		this.size++;
+	}
+	
+	/*
+	 * Adds a card to the bottom of the deck
+	 */
+	public void addBottom(Card c)
+	{
+		deck.add(c);
+		this.size++;
+	}
 	
 //	public static void main(String[] args)
 //	{
+//		Deck d = new Deck();
+//		System.out.println("size is " + d.getSize());
+//		Card c = d.draw();
+//		System.out.println(c.getRank());
+//		System.out.println("new size is " + d.getSize());
+//		d.addTop(c);
+//		System.out.println("new size is " + d.getSize() + " and top card is " + (d.getCard(0)).getRank());
+//		d.addBottom(c);
+//		System.out.println("new size is " + d.getSize() + " and bottom card is " + (d.getCard(d.getSize() - 1)).getRank());
 //		
 //	}
 }

@@ -1,5 +1,6 @@
 import java.util.ArrayList;
-public class Hand {
+public class Hand 
+{
 	protected int size;
 	private ArrayList<Card> hand = new ArrayList<Card>();
 	
@@ -46,6 +47,35 @@ public class Hand {
 		{
 			return hand.remove(index);
 		}
+	}
+	
+	/*
+	 * Returns a card from the hand given an index 
+	 */
+	public Card view(int index)
+	{
+		return hand.get(index);
+	}
+	
+	/*
+	 * Returns a copy of the hand 
+	 */
+	public ArrayList<Card> getHand() {
+		ArrayList<Card> handView = new ArrayList<Card>();
+		for(int i = 0 ; i < hand.size(); i++)
+		{
+			Card c = new Card((hand.get(i)).getValue(), (hand.get(i)).getSuit());
+			handView.add(c);
+		}
+		return handView;
+	}
+	
+	/*
+	 * Returns size of hand
+	 */
+	public int size()
+	{
+		return hand.size();
 	}
 	
 	/*

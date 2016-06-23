@@ -95,18 +95,4 @@ public class Deck
 		deck.add(c);
 		this.size++;
 	}
-	
-//	public static void main(String[] args)
-//	{
-//		Deck d = new Deck();
-//		System.out.println("size is " + d.getSize());
-//		Card c = d.draw();
-//		System.out.println(c.getRank());
-//		System.out.println("new size is " + d.getSize());
-//		d.addTop(c);
-//		System.out.println("new size is " + d.getSize() + " and top card is " + (d.getCard(0)).getRank());
-//		d.addBottom(c);
-//		System.out.println("new size is " + d.getSize() + " and bottom card is " + (d.getCard(d.getSize() - 1)).getRank());
-//		
-//	}
 }

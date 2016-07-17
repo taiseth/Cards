@@ -1,29 +1,28 @@
 import java.util.ArrayList;
+
 public class Hand 
 {
-	protected int size;
 	private ArrayList<Card> hand = new ArrayList<Card>();
 	
 	/*
-	 * Default constructor for hand 
+	 * Default constructor for hand
 	 */
 	public Hand()
 	{
-		this.size = 0;
+		
 	}
 	
 	/*
-	 * Adds a card to the hand 
+	 * Adds a card to the hand
 	 */
 	public void receive(Card c)
 	{
 		hand.add(c);
-		this.size++;
 	}
 	
 	/*
 	 * Returns the card removed from the hand
-	 * given the index 
+	 * given the index
 	 */
 	public Card give(int index)
 	{
@@ -31,9 +30,8 @@ public class Hand
 	}
 	
 	/*
-	 * Returns the card removed from the hand
-	 * given a value and suit
-	 * Returns null if the card does not exist in the hand 
+	 * Returns the card removed from the hand given a value and suit
+	 * Returns null if the card does not exist in the hand
 	 */
 	public Card give(int value, String suit)
 	{
@@ -50,7 +48,7 @@ public class Hand
 	}
 	
 	/*
-	 * Returns a card from the hand given an index 
+	 * Returns a card from the hand given an index
 	 */
 	public Card view(int index)
 	{
@@ -58,11 +56,12 @@ public class Hand
 	}
 	
 	/*
-	 * Returns a copy of the hand 
+	 * Returns  a copy of the hand
 	 */
-	public ArrayList<Card> getHand() {
+	public ArrayList<Card> getHand()
+	{
 		ArrayList<Card> handView = new ArrayList<Card>();
-		for(int i = 0 ; i < hand.size(); i++)
+		for(int i = 0; i < hand.size(); i++)
 		{
 			Card c = new Card((hand.get(i)).getValue(), (hand.get(i)).getSuit());
 			handView.add(c);
@@ -84,14 +83,8 @@ public class Hand
 	 */
 	public ArrayList<Card> empty()
 	{
-		ArrayList<Card> cards = new ArrayList<Card>();
-		for(int i = 0 ; i < hand.size(); i++)
-		{
-			Card c = new Card((hand.get(i)).getValue(), (hand.get(i)).getSuit());
-			cards.add(c);
-		}
-		
+		ArrayList<Card> cards = getHand();		
 		hand.clear();
-		return cards;		
+		return cards;
 	}
 }

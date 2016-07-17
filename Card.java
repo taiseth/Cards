@@ -1,12 +1,11 @@
 
-public class Card 
-{
-	protected int value;
-	protected String suit;
+public class Card {
+	private int value;
+	private String suit;
 	
 	/*
 	 * Constructor for a card that takes in an
-	 * integer for a value and a string for the suit 
+	 * integer for a value and a string for the suit
 	 */
 	public Card(int value, String suit)
 	{
@@ -15,7 +14,7 @@ public class Card
 	}
 	
 	/*
-	 * Returns the value of the card 
+	 * Returns the value of the card
 	 */
 	public int getValue()
 	{
@@ -23,7 +22,7 @@ public class Card
 	}
 	
 	/*
-	 * Returns the suit of the card  
+	 * Returns the suit of the card
 	 */
 	public String getSuit()
 	{
@@ -35,7 +34,7 @@ public class Card
 	
 	/*
 	 * Returns color of the card based on the suit
-	 * If invalid suit, returns "invalid suit" 
+	 * If invalid suit or joker, returns "invalid suit" or "joker"
 	 */
 	public String getColor()
 	{
@@ -59,7 +58,7 @@ public class Card
 	
 	/*
 	 * Returns the rank of the card
-	 * such as Ace, Jack, Queen, King, etc. 
+	 * such as Ace, Jack, Queen, King, etc
 	 */
 	public String getRank()
 	{
@@ -96,7 +95,7 @@ public class Card
 					break;
 			default: rank = "invalid value";
 					break;
-		}		
+		}
 		return rank;
 	}
 }

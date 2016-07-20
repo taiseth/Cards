@@ -1,25 +1,17 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Blackjack 
+public class Blackjack
 {
 	//amount of money player has
 	private static int money = 1000;
 	
 	//amount of money player has bet
 	private static int pot = 0;
-	
-	//numeric value of player's hand
-	private static int handVal = 0;
-	
-	//numeric value of player's hand where Aces only count as 1's
-	private static int aceVal = 0;
-	
-	//indication whether player has one ace in hand
-	private static boolean oneAce;
-	
+		
 	//dealer's hand
 	private static String dHand;
-	
+		
 	//player's hand
 	private static String pHand;
 	
@@ -40,119 +32,336 @@ public class Blackjack
 		player = new Hand();
 		boolean round = true;
 		
-		intro(); //tell the rules;
+		intro(); //tell the rules
 		
 		Scanner f = new Scanner(System.in);
 		System.out.println("Press enter to begin");
 		f.nextLine();
 		
-		while(round) //while player has money or wants to continue playing
+		while(round)
 		{
-			pot = betting(); //bet of $1 or more needs to be made before cards are dealt
+			pot = betting(f); //bet of $1 or more needs to be made before cards are dealt
 			
 			int num21 = deal(); //1 if player has blackjack with starting cards, else 0
+			System.out.println("Your hand: " + pHand);
+			System.out.println("Dealer's hand: " + dHand);
 			if(num21 == 1) //if 21, check dealer's hand
 			{
-				System.out.println("You got blackjack!");
-				int dealer21 = dealer(); //-1 if dealer blackjack, else player wins w/ blackjack
-				if(dealer21 == -1)
+				System.out.println("You got blackjack!");				
+				int[] dealerVals = handValue(house);
+				
+				if(dealerVals[0] == 21 || dealerVals[1] == 21)
 				{
 					System.out.println("But so did the dealer. Tie!");
-					payout(false, true);
+					payout(false, true);					
 				}
 				else
 				{
 					System.out.println("You win!");
 					payout(true, true);
-				}
+				}				
 			}
-			else //player doesn't have blackjack and plays normally
+			else //player doesn't have blackjack, so plays normally
 			{
-				playerActions();
-				int dealerResult = dealer(); //-1 for blackjack, 0 for bust, else normal values
-			}
-			
-			System.out.println("Would you like to play another round? (y/n)");
-			boolean valid = false;
-			while(!valid)
-			{
-				String ans = f.nextLine();
-				ans.toLowerCase();
-				if(ans.equals("y"))
+				int playerResult = playerActions(player, pot, 0, f, -2);
+				if(playerResult != 0 && playerResult != -1) //bust or split
 				{
-					round = true;
-					valid = true;
-				}
-				else if(ans.equals("n"))
-				{
-					round = false;
-					valid = true;
-				}
-				else
-				{
-					System.out.println("Not a valid answer. Try again.");
+					int dealerResult = dealer(); //0 for bust, else normal values
+					System.out.println("Dealer's hand: " + dHand);
+					comparison(playerResult, dealerResult);
 				}
 			}
 			
+			dHand = "";
+			pHand = "";
+			house = new Hand();
+			player = new Hand();
 			if(money < 1)
 			{
 				round = false;
 				System.out.println("You don't have enough money to play.");
 				System.out.println("Game Over!");
 			}
+			else
+			{
+				System.out.println("Would you like to play another round? (y/n)");
+				boolean valid = false;
+				while(!valid)
+				{
+					String ans = f.nextLine();
+					ans.toLowerCase();
+					if(ans.equals("y"))
+					{
+						round = true;
+						valid = true;
+					}
+					else if(ans.equals("n"))
+					{
+						System.out.println("Thanks for playing!");
+						round = false;
+						valid = true;
+					}
+					else
+					{
+						System.out.println("Not valid answer. try again.");
+					}
+				}
+			}
 		}
 		f.close();
 	}
 	
-	private static void playerActions()
+	//Handles the different choices a player can make
+	//such as hit, stand, split, or double down
+	//returns 0 for bust, -1 for split which is resolved within itself or the value of the player's hand
+	private static int playerActions(Hand h, int bet, int numSplit, Scanner p, int dealerSplit)
 	{
-		Scanner p = new Scanner(System.in);
 		int decision = 0; //1 for hit, 2 for stand, 3 for split, 4 for double down
 		boolean action = true; //false once player has chosen a valid decision
+		int result = 0;
+		Hand temp = h;
 		
 		while(action)
 		{
 			System.out.println("Choose an action: [1] Hit [2] Stand [3] Split [4] Double down");
-			decision = p.nextInt();
+			boolean validInput = false;
+			while(!validInput)
+			{
+				try
+				{
+					decision = p.nextInt();
+					p.nextLine();
+					validInput = true;
+				}
+				catch(InputMismatchException e)
+				{
+					System.out.println("Invalid input. Enter an integral number");
+					p.nextLine();
+					validInput = false;
+				}
+			}
+			
 			if(decision == 1) //hit
 			{
+				if(d.getSize() == 0)
+				{
+					d = new Deck();
+					d.shuffle();
+				}
+				temp.receive(d.draw());
 				
+				//check if player's hand is 21 or bust, otherwise continue loop
+				int[] values = handValue(temp);
+				String tempHand = handString(temp);
+				System.out.println("Your hand: " + tempHand);
+				
+				if(values[0] > 21 && values[1] > 21) //both values bust; lost round
+				{
+					System.out.println("Busted. You lose.");
+					payout(false, false);
+					action = false;
+					result = 0;
+				}				
 			}
 			else if(decision == 2) //stand
 			{
-				
+				int[] finalVal = handValue(temp);
+				if(finalVal[0] > 21)
+				{
+					result = finalVal[1];
+				}
+				else
+				{
+					result = finalVal[0];
+				}
+				action = false;
 			}
 			else if(decision == 3) //split
 			{
-				
+				if(numSplit >= 3)
+				{
+					System.out.println("You can no longer split your hand.");
+				}
+				else if(temp.size() != 2) //can only split if starting hand is pairs
+				{
+					System.out.println("You have more than two cards. You can't split your hand.");
+				}
+				else if(((temp.view(0)).getValue() != ((temp.view(1)).getValue()))) //starting hand aren't pairs
+				{
+					System.out.println("Your hand is not a pair. You can't split your hand.");
+				}
+				else if(money < pot * (numSplit + 1)) //doesn't have enough money to split
+				{
+					System.out.println("You don't have enough money to split.");
+				}
+				else
+				{
+					money -= bet;
+					if(dealerSplit == -2)
+					{
+						dealerSplit = dealer();
+					}
+					split(temp, bet, numSplit + 1, p, dealerSplit);
+					action = false;
+					result = -1;
+				}
 			}
-			else if(decision == 4) //double down
+			else if(decision == 4)//double down
 			{
-				
+				if(temp.size() != 2) //can only double down starting hand
+				{
+					System.out.println("You can only double down on your starting hand.");
+				}
+				else if(money < pot) //doesn't have enough money to double bet
+				{
+					System.out.println("You don't have enough money to double down.");
+				}
+				else //bet is doubled and player received one card
+				{
+					money -= pot;
+					pot *= 2;
+					if(d.getSize() == 0)
+					{
+						d = new Deck();
+						d.shuffle();
+					}
+					temp.receive(d.draw());
+					
+					int[] finalVal = handValue(temp);
+					String tempHand = handString(temp);
+					System.out.println("Your hand: " + tempHand);
+					
+					if(finalVal[0] > 21)
+					{
+						if(finalVal[1] > 21) //busted
+						{
+							System.out.println("Busted. You lose.");
+							payout(false, false);
+							action = false;
+							result = 0;
+						}
+						else
+						{
+							action = false;
+							result = finalVal[1];
+						}
+					}
+					else
+					{
+						action = false;
+						result = finalVal[0];
+					}
+				}
 			}
 			else //invalid choice
 			{
-				
+				System.out.println("Invalid action. Try again.");
 			}
 		}
-		
-		p.close();
+		return result;
 	}
 	
-	private static Hand hit(Hand h)
+	//Takes in a hand, the initial bet on the starting hand, and how many splits
+	//the player has done. Max is 3.
+	private static void split(Hand h, int initBet, int nSplit, Scanner n, int dSplit)
 	{
-		Hand hitHand = h;
+		//splitting given hand and drawing a card for each hand
+		Hand hand1 = new Hand();
+		Hand hand2 = new Hand();
+		hand1.receive(h.give(0));
+		hand2.receive(h.give(1));
 		if(d.getSize() == 0)
 		{
 			d = new Deck();
 			d.shuffle();
 		}
-		hitHand.receive(d.draw());
+		hand1.receive(d.draw());
 		
-		return hitHand;
+		if(d.getSize() == 0)
+		{
+			d = new Deck();
+			d.shuffle();
+		}
+		hand2. receive(d.draw());
+		
+		//first hand
+		String h1 = handString(hand1);
+		System.out.println("Your hand: " + h1);
+		int[] h1Val = handValue(hand1);
+		if(h1Val[0] == 21 || h1Val[1] == 21)
+		{
+			System.out.println("Blackjack! You win!");
+			payout(true, true);
+		}
+		else
+		{
+			int numHand = playerActions(hand1, initBet, nSplit, n, dSplit);
+			if(numHand != 0)
+			{
+				System.out.println("Dealer's hand: " + dHand);
+				comparison(numHand, dSplit);
+			}
+		}
+		
+		//second hand
+		pot = initBet;
+		String h2 = handString(hand2);
+		System.out.println("Your hand: " + h2);
+		int[] h2Val = handValue(hand2);
+		if(h2Val[0] == 21 || h2Val[1] == 21)
+		{
+			System.out.println("Blackjack! You win!");
+			payout(true, true);
+		}
+		else
+		{
+			int numHand = playerActions(hand2, initBet, nSplit, n, dSplit);
+			if(numHand != 0)
+			{
+				System.out.println("Dealer's hand: " + dHand);
+				comparison(numHand, dSplit);
+			}
+		}
 	}
 	
-	//handles the payout and resets the pot
+	//Takes in the value of a player's hand and the dealer's hand
+	//Compares the two to decide who wins or loses the round
+	//Or if the round ends in a tie
+	private static void comparison(int pVal, int dVal)
+	{
+		if(dVal == -1) //dealer got blackjack
+		{
+			System.out.println("Dealer got blackjack. You lose!");
+			payout(false, false);
+		}
+		else if(dVal == 0) //dealer bust
+		{
+			System.out.println("Dealer bust. You win!");
+			payout(true, false);
+		}
+		else //compare values to see if win, lose, or draw
+		{
+			if(pVal > dVal) //win
+			{
+				System.out.println("You win!");
+				payout(true, false);
+			}
+			else if(pVal < dVal) //lose
+			{
+				System.out.println("You lose!");
+				payout(false, false);
+			}
+			else //tie
+			{
+				System.out.println("Draw!");
+				payout(false, true);
+			}
+		}
+		
+		System.out.println("You have $" + money + " left.");
+	}
+	
+	//Handles the payout at the end of a round and resets the pot
 	//3:2 payout if blackjack, else 2:1
 	private static void payout(boolean win, boolean bj)
 	{
@@ -168,64 +377,17 @@ public class Blackjack
 		{
 			money += pot;
 		}
+		//lost, doesn't receive any money (false, false)
 		//pot resets regardless of win or loss
-		pot = 0;		
+		pot = 0;
 	}
 	
-	//Dealer follows rules given in intro/rules
+	//Dealer follows rules given in intro()
 	//Returns value of dealer's hand
-	//Returns -1 if dealer got blackjack with starting hand
+	//or 0 if dealer busts
 	private static int dealer()
-	{
-		int dealerVal = 0;
-		int dealerAce = 0;
-		boolean hasAce = false;
-		
-		//get second card
-		if(d.getSize() == 0)
-		{
-			d = new Deck();
-			d.shuffle();
-		}
-		house.receive(d.draw());
-		System.out.println("Drawing card...");
-		dHand += ", " + (house.view(1)).getRank();
-		
-		//calculate hand and check for blackjack
-		for(int j = 0; j < house.size(); j++)
-		{
-			if(((house.view(j)).getRank()).equals("Ace")) //card is Ace, decide if 1 or 11 value
-			{
-				if(hasAce)
-				{
-					dealerVal += 1;
-				}
-				else
-				{
-					dealerVal += 11;
-					hasAce = true;
-				}
-				dealerAce += 1;
-			}
-			else if(((house.view(j)).getRank()).equals("King") || ((house.view(j)).getRank()).equals("Queen") 
-					|| ((house.view(j)).getRank()).equals("Jack")) //face card values
-			{
-				dealerVal += 10;
-				dealerAce += 10;
-			}
-			else //normal value card
-			{
-				dealerVal += (house.view(j)).getValue();
-				dealerAce += (house.view(j)).getValue();
-			}
-			
-			System.out.println("Dealer hand: " + dHand);
-			if(dealerVal == 21)
-			{
-				return -1; //Dealer got blackjack; beats regular 21
-			}
-		}
-		
+	{		
+		int[] dealerVals = handValue(house);	
 		//must hit if hand is less than 17
 		//stand if 17 or higher
 		boolean hit = true;
@@ -233,9 +395,9 @@ public class Blackjack
 		while(hit)
 		{
 			//check if bust
-			if(dealerVal > 21)
+			if(dealerVals[0] > 21)
 			{
-				if(dealerAce > 21)
+				if(dealerVals[1] > 21)
 				{
 					return 0;
 				}
@@ -246,15 +408,15 @@ public class Blackjack
 			}
 			
 			//check if dealer should stand
-			if((dealerVal >= 17 && dealerVal <= 21) || (dealerAce >= 17 && dealerAce <= 21))
+			if((dealerVals[0] >= 17 && dealerVals[0] <= 21) || (dealerVals[1] >= 17 && dealerVals[1] <= 21))
 			{
-				if(useAce) //only reason this is true is if dealerVal is bust
+				if(useAce) //only reason this is true is if dealerVals[0] is bust
 				{
-					return dealerAce;
+					return dealerVals[1];
 				}
 				else
 				{
-					return dealerVal;
+					return dealerVals[0];
 				}
 			}
 			
@@ -265,38 +427,14 @@ public class Blackjack
 				d.shuffle();
 			}
 			house.receive(d.draw());
-			dHand += ", " + (house.view(1)).getRank();
-			
-			if(((house.view(house.size() - 1).getRank()).equals("Ace")))
-			{
-				if(hasAce)
-				{
-					dealerVal += 1;
-				}
-				else
-				{
-					dealerVal += 11;
-					hasAce = true;
-				}
-				dealerAce += 1;
-			}
-			else if(((house.view(house.size() - 1)).getRank()).equals("King") || ((house.view(house.size() - 1)).getRank()).equals("Queen") 
-					|| ((house.view(house.size() - 1)).getRank()).equals("Jack"))
-			{
-				dealerVal += 10;
-				dealerAce += 10;
-			}
-			else
-			{
-				dealerVal += (house.view(house.size() - 1)).getValue();
-				dealerAce += (house.view(house.size() - 1)).getValue();
-			}
+			dealerVals = handValue(house);
+			dHand = handString(house);
 		}
 		return 0;
 	}
 	
 	//Deals out the hands and checks if player has 21
-	//If so, player auto-wins unless dealer also has blackjack
+	//If so, player wins unless dealer also has blackjack
 	//else, round continues
 	//returns 1 for blackjack, otherwise 0
 	private static int deal()
@@ -323,57 +461,78 @@ public class Blackjack
 		}
 		player.receive(d.draw());
 		
-		dHand = (house.view(0)).getRank();
-		System.out.println("Dealer's hand: " + dHand);
-		pHand = "";
-		oneAce = false;
-		handVal = 0;
-		aceVal = 0;
-		
-		for(int i =0; i < player.size(); i++) //calculate hand w/ special value cards A, K, Q, J
+		if(d.getSize() == 0)
 		{
-			pHand += (player.view(i)).getRank() + ", ";
-			if(((player.view(i)).getRank()).equals("Ace"))
-			{
-				if(oneAce)
-				{
-					handVal += 1;
-				}
-				else
-				{
-					handVal += 11;
-					oneAce = true;
-				}
-				aceVal += 1;
-			}
-			else if(((player.view(i)).getRank()).equals("King") || ((player.view(i)).getRank()).equals("Queen") 
-					|| ((player.view(i)).getRank()).equals("Jack"))
-			{
-				handVal += 10;
-				aceVal += 10;
-			}
-			else
-			{
-				handVal += (player.view(i)).getValue();
-				aceVal += (player.view(i)).getValue();
-			}
+			d = new Deck();
+			d.shuffle();
 		}
+		house.receive((d.draw()));
 		
-		pHand = pHand.substring(0, pHand.length() - 2); //removes comma at end
-		System.out.println("Your hand: " + pHand);
-		if(handVal == 21)
+		dHand = handString(house);
+		pHand = handString(player);
+		int[] hVal = handValue(player);
+		if(hVal[0] == 21 || hVal[1] == 21)
 		{
 			blackjack = 1;
 		}
 		return blackjack;
 	}
 	
+	//Returns a hand of cards as a string
+	private static String handString(Hand h)
+	{
+		String s = "";
+		for(int i = 0; i < h.size(); i++)
+		{
+			s += (h.view(i)).getRank() + ", ";
+		}
+		
+		s = s.substring(0, s.length() - 2); //remove comma at end
+		return s;
+	}
+	
+	//Takes a hand as a parameter
+	//Returns the two possible values the hand could be
+	private static int[] handValue(Hand h)
+	{
+		int[] val = new int[2];
+		boolean hasAce = false;
+		
+		for(int i = 0; i < h.size(); i++)
+		{
+			if(((h.view(i)).getRank()).equals("Ace"))
+			{
+				if(hasAce)
+				{
+					val[0] += 1;
+				}
+				else
+				{
+					val[0] += 11;
+					hasAce = true;
+				}
+				val[1] += 1;
+			}
+			else if(((h.view(i)).getRank()).equals("King") || ((h.view(i)).getRank()).equals("Queen") 
+					|| ((h.view(i)).getRank()).equals("Jack"))
+			{
+				val[0] += 10;
+				val[1] += 10;
+			}
+			else
+			{
+				val[0] += (h.view(i)).getValue();
+				val[1] += (h.view(i)).getValue();
+			}
+		}
+		return val;
+	}
+	
 	//Player makes a bet of at least $1
 	//Allowed to change bet
 	//Returns final bet amount
-	private static int betting()
+	private static int betting(Scanner s)
 	{
-		Scanner s = new Scanner(System.in);
 		int choice = 0;
 		int bet = 0;
 		 
@@ -385,7 +544,24 @@ public class Blackjack
 			System.out.println("How much would you like to bet?");
 			System.out.println("[1] $1 [2] $5 [3] $10 [4] $20 [5] $50 [6] $100 [7] $500 [8] $1000");
 			System.out.println("Enter a choice from 1 to 8.");
-			choice = s.nextInt();
+			
+			boolean validInput = false;
+			while(!validInput)
+			{
+				try
+				{
+					choice = s.nextInt();
+					s.nextLine();
+					validInput = true;
+				}
+				catch(InputMismatchException e)
+				{
+					System.out.println("Invalid input. Enter an integral number");
+					s.nextLine();
+					validInput = false;
+				}
+			}
+			
 			switch(choice)
 			{
 				case 1: bet = 1;
@@ -408,8 +584,7 @@ public class Blackjack
 						break;
 			}
 			
-			if(choice != 1 || choice != 2 || choice != 3 || choice != 4 || 
-					choice != 5 || choice != 6 || choice != 7 || choice != 8)
+			if(choice < 1 || choice > 8)
 			{
 				System.out.println("Invalid bet. Try again.");
 			}
@@ -433,15 +608,48 @@ public class Blackjack
 			System.out.println("You have $" + money + ".");
 			System.out.println("Would you like to increase or decrease your bet?");
 			System.out.println("Enter 1 to increase, 2 to decrease, 3 for neither");
-			choice = s.nextInt();
+			boolean validInput = false;
+			while(!validInput)
+			{
+				try
+				{
+					choice = s.nextInt();
+					s.nextLine();
+					validInput = true;
+				}
+				catch(InputMismatchException e)
+				{
+					System.out.println("Invalid input. Enter an integral number");
+					s.nextLine();
+					validInput = false;
+				}
+			}
+			
 			if(choice == 1) //increase bet
 			{
 				if(money != 0) //has money to bet
 				{
 					System.out.println("You have $" + money + ".");
-					System.out.println("Would you like to increase or decrease your bet?");
-					System.out.println("Enter 1 to increase, 2 to decrease, 3 for neither");
-					choice = s.nextInt();
+					System.out.println("How much would you like to increase?");
+					System.out.println("[1] $1 [2] $5 [3] $10 [4] $20 [5] $50 [6] $100 [7] $500 [8] $1000");
+					System.out.println("Enter a choice from 1 to 8.");
+					validInput = false;
+					while(!validInput)
+					{
+						try
+						{
+							choice = s.nextInt();
+							s.nextLine();
+							validInput = true;
+						}
+						catch(InputMismatchException e)
+						{
+							System.out.println("Invalid input. Enter an integral number");
+							s.nextLine();
+							validInput = false;
+						}
+					}
+					
 					switch(choice)
 					{
 						case 1: secBet = 1;
@@ -464,12 +672,11 @@ public class Blackjack
 								break;
 					}
 					
-					if(choice != 1 || choice != 2 || choice != 3 || choice != 4 || 
-						choice != 5 || choice != 6 || choice != 7 || choice != 8)
+					if(choice < 1 || choice > 8)
 					{
 						System.out.println("Invalid bet. Try again.");
 					}
-					else if(money - bet - secBet < 0)
+					else if(money - secBet < 0)
 					{
 						System.out.println("You do not have enough money to make this bet. Try again.");
 					}
@@ -490,7 +697,23 @@ public class Blackjack
 				System.out.println("How much would you like to decrease?");
 				System.out.println("[1] $1 [2] $5 [3] $10 [4] $20 [5] $50 [6] $100 [7] $500 [8] $1000");
 				System.out.println("Enter a choice from 1 to 8.");
-				choice = s.nextInt();
+				validInput = false;
+				while(!validInput)
+				{
+					try
+					{
+						choice = s.nextInt();
+						s.nextLine();
+						validInput = true;
+					}
+					catch(InputMismatchException e)
+					{
+						System.out.println("Invalid input. Enter an integral number");
+						s.nextLine();
+						validInput = false;
+					}
+				}
+				
 				switch(choice)
 				{
 					case 1: secBet = 1;
@@ -513,8 +736,7 @@ public class Blackjack
 							break;
 				}
 				
-				if(choice != 1 || choice != 2 || choice != 3 || choice != 4 || 
-					choice != 5 || choice != 6 || choice != 7 || choice != 8)
+				if(choice < 1 || choice > 8)
 				{
 					System.out.println("Invalid bet. Try again.");
 				}
@@ -538,10 +760,9 @@ public class Blackjack
 				System.out.println("Invalid choice. Try again.");
 			}
 		}
-		s.close();
 		return bet;
-	}
-		
+	}	
+	
 	//Introducing the game and stating the rules
 	private static void intro()
 	{
@@ -550,5 +771,5 @@ public class Blackjack
 		System.out.println("1. Dealer must hit if their hand is less than 17");
 		System.out.println("2. Dealer stands on all 17s or higher\n");
 		System.out.println("Blackjack pays 3 to 2, a normal win pays 2 to 1");
-	}
+	}	
 }

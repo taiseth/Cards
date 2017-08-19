@@ -45,10 +45,10 @@ public class Blackjack
 			int num21 = deal(); //1 if player has blackjack with starting cards, else 0
 			System.out.println("Your hand: " + pHand);
 			System.out.println("Dealer's hand: " + dHand);
+			int[] dealerVals = handValue(house);
 			if(num21 == 1) //if 21, check dealer's hand
 			{
 				System.out.println("You got blackjack!");				
-				int[] dealerVals = handValue(house);
 				
 				if(dealerVals[0] == 21 || dealerVals[1] == 21)
 				{
@@ -60,6 +60,11 @@ public class Blackjack
 					System.out.println("You win!");
 					payout(true, true);
 				}				
+			}
+			else if(dealerVals[0] == 21 || dealerVals[1] == 21) //dealer has blackjack and player doesn't (immediate loss)
+			{
+				System.out.println("Dealer got blackjack! You lose!");
+				payout(false, false);
 			}
 			else //player doesn't have blackjack, so plays normally
 			{
@@ -137,7 +142,6 @@ public class Blackjack
 				{
 					System.out.println("Invalid input. Enter an integral number");
 					p.nextLine();
-					validInput = false;
 				}
 			}
 			
@@ -502,7 +506,7 @@ public class Blackjack
 		{
 			if(((h.view(i)).getRank()).equals("Ace"))
 			{
-				if(hasAce)
+				if(hasAce) //if first ace count as 11, subsequent aces count as 1
 				{
 					val[0] += 1;
 				}
